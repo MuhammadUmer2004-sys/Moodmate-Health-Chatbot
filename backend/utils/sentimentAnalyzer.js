@@ -9,22 +9,30 @@ exports.getSentiment = (text) => {
     const tokens = tokenizer.tokenize(text.toLowerCase());
     const score = analyzer.getSentiment(tokens) || 0;
     
-    // Custom keyword detection for better precision
-    const anxiousKeywords = ['anxious', 'worried', 'scared', 'nervous', 'panic', 'stress', 'stressed', 'fear'];
-    const sadKeywords = ['sad', 'depressed', 'lonely', 'unhappy', 'crying', 'heartbroken', 'hopeless'];
-    const urgentKeywords = ['suicide', 'hurt', 'kill', 'end it', 'die', 'emergency', 'harm'];
+    // Custom keyword detection for targeted emotions
+    const anxietyKeywords = ['anxious', 'anxiety', 'worried', 'scared', 'nervous', 'panic', 'stress', 'stressed', 'fear', 'overwhelmed'];
+    const sadKeywords = ['sad', 'depressed', 'lonely', 'unhappy', 'crying', 'heartbroken', 'hopeless', 'down', 'miserable'];
+    const angerKeywords = ['anger', 'angry', 'mad', 'furious', 'hate', 'annoyed', 'frustrated', 'rage', 'irritated'];
+    const excitementKeywords = ['excitement', 'excited', 'thrilled', 'amazing', 'awesome', 'pumped', 'ecstatic', 'stoked', 'fantastic'];
+    const happyKeywords = ['happy', 'joy', 'good', 'great', 'content', 'glad', 'peaceful'];
+    const urgentKeywords = ['suicide', 'hurt', 'kill', 'end it', 'die', 'emergency', 'harm', 'give up'];
 
     let category = 'neutral';
     let isUrgent = false;
     
+    // Priority order: Urgent -> Emotion Keywords -> General Score fallback
     if (tokens.some(t => urgentKeywords.includes(t))) {
       category = 'urgent';
       isUrgent = true;
-    } else if (tokens.some(t => anxiousKeywords.includes(t))) {
-      category = 'anxious';
-    } else if (tokens.some(t => sadKeywords.includes(t)) || score < -0.3) {
+    } else if (tokens.some(t => angerKeywords.includes(t))) {
+      category = 'anger';
+    } else if (tokens.some(t => anxietyKeywords.includes(t))) {
+      category = 'anxiety';
+    } else if (tokens.some(t => excitementKeywords.includes(t))) {
+      category = 'excitement';
+    } else if (tokens.some(t => sadKeywords.includes(t)) || score <= -0.4) {
       category = 'sad';
-    } else if (score > 0.3) {
+    } else if (tokens.some(t => happyKeywords.includes(t)) || score > 0.4) {
       category = 'happy';
     }
 
