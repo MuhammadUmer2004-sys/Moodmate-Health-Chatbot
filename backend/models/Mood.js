@@ -4,8 +4,7 @@ const MoodSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   moodType: { 
     type: String, 
-    required: true,
-    enum: ["happy", "sad", "neutral", "unstable", "anxious", "excited", "angry"]
+    required: true
   },
   note: { type: String },
   sentimentScore: { type: Number }, // From sentiment analysis
