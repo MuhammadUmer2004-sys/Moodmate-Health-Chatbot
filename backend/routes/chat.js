@@ -1,66 +1,61 @@
 const express = require("express");
 const router = express.Router();
-const jwt = require("jsonwebtoken");
-const Message = require("../models/Message"); // ✅ Correct model import
+const Message = require("../models/Message");
+const verifyToken = require("../middleware/verifyToken");
+const { getSentiment } = require("../utils/sentimentAnalyzer");
+const axios = require("axios");
 
-// Auth middleware
-function authMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Missing token" });
-  }
-
-  const token = authHeader.split(" ")[1];
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.userId;
-    next();
-  } catch {
-    return res.status(403).json({ message: "Invalid token" });
-  }
-}
-
-// POST /chat/send - Save message and return bot response
-router.post("/send", authMiddleware, async (req, res) => {
+// POST /api/chat - Save message and return bot response
+router.post("/", verifyToken, async (req, res) => {
   const { text } = req.body;
-  const userId = req.userId;
+  const userId = req.user.userId;
 
-  console.log("Incoming message:", text);
-
-  // Basic sentiment analysis
-  let sentiment = "neutral";
-  const lower = text.toLowerCase();
-  if (lower.includes("happy") || lower.includes("good")) sentiment = "positive";
-  else if (lower.includes("bad") || lower.includes("sad")) sentiment = "negative";
-
-  const botReply = `Hello! You said: "${text}"`;
+  const sentiment = getSentiment(text);
+  
+  let responseText = `Hello! I see you're feeling ${sentiment}. How can I support you today?`;
+  
+  // Try OpenAI if API key exists
+  if (process.env.OPENAI_API_KEY) {
+    try {
+      const gptResponse = await axios.post(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are MoodMate, an empathetic mental health assistant." },
+            { role: "user", content: text }
+          ],
+        },
+        {
+          headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+        }
+      );
+      responseText = gptResponse.data.choices[0].message.content;
+    } catch (err) {
+      console.error("OpenAI Error:", err.message);
+    }
+  }
 
   try {
-    const newMessage = new Message({
+    const message = new Message({
       userId,
       text,
-      response: botReply,
+      response: responseText,
       sentiment,
     });
 
-    await newMessage.save(); // ✅ Save to MongoDB
-
-    res.json({
-      response: botReply,
-      sentiment: sentiment,
-    });
+    await message.save();
+    res.json(message);
   } catch (err) {
-    console.error("Error saving to DB:", err);
-    res.status(500).json({ error: "Database error" });
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// GET /chat/all - Fetch all messages for this user
-router.get("/all", authMiddleware, async (req, res) => {
+// GET /api/chat/history - Fetch history
+router.get("/history", verifyToken, async (req, res) => {
   try {
-    const messages = await Message.find({ userId: req.userId }).sort({ timestamp: -1 });
-    res.json({ messages });
+    const messages = await Message.find({ userId: req.user.userId }).sort({ timestamp: -1 });
+    res.json(messages);
   } catch (err) {
     res.status(500).json({ error: "Error fetching messages" });
   }

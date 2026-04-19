@@ -1,32 +1,39 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 const router = express.Router();
 
-const demoUser = {
-  username: "testuser",
-  password: "testpass",
-  _id: "demo123",
-};
+// Register
+router.post("/register", async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) return res.status(400).json({ message: "User already exists" });
 
-router.post("/login", (req, res) => {
-  console.log("Login endpoint hit");
-  console.log("JWT_SECRET from env:", process.env.JWT_SECRET);
+    const user = new User({ username, email, password });
+    await user.save();
 
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res.status(400).json({ message: "Username and password are required" });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "12h" });
+    res.status(201).json({ token, user: { username: user.username, email: user.email } });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
+});
 
-  if (username === demoUser.username && password === demoUser.password) {
-    const token = jwt.sign({ userId: demoUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "12h",
-    });
+// Login
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
-    return res.json({ token });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "12h" });
+    res.json({ token, user: { username: user.username, email: user.email } });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-
-  return res.status(401).json({ message: "Invalid credentials" });
 });
 
 module.exports = router;

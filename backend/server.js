@@ -4,22 +4,22 @@ const cors = require("cors");
 require("dotenv").config();
 
 const chatRoutes = require("./routes/chat");
-const testTokenRoute = require("./routes/testToken");
 const authRoutes = require("./routes/auth");
+const moodRoutes = require("./routes/moods");
 
 const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // frontend URL
+    origin: ["http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:5173"], 
     credentials: true,
   })
 );
 app.use(express.json());
 
 app.use("/api/chat", chatRoutes);
-app.use("/api", testTokenRoute);
-app.use("/api/auth", authRoutes); // ✅ correct prefix
+app.use("/api/auth", authRoutes);
+app.use("/api/moods", moodRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI, {
