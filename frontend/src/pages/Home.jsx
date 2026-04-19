@@ -1,132 +1,92 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, Activity, Brain, ArrowRight } from 'lucide-react';
+import heroImage from '../assets/hero.png';
 
 const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="hero-container" style={{ 
+    <div className="home-container" style={{ 
       minHeight: '100vh', 
-      display: 'flex', 
-      flexDirection: 'column',
-      justifyContent: 'center',
+      width: '100%',
+      position: 'relative',
+      overflow: 'hidden',
+      display: 'flex',
       alignItems: 'center',
-      padding: '40px 20px',
-      background: 'radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 40%)'
+      justifyContent: 'center',
+      background: '#0a0a1a'
     }}>
-      
-      {/* Background Glows (Simulating the image) */}
+      {/* Background Image Layer */}
       <div style={{
-        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-        zIndex: -1,
-        background: 'url("https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2070&auto=format&fit=crop") center/cover no-repeat',
-        filter: 'brightness(0.3) blur(20px)',
-        opacity: 0.6
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundImage: `url(${heroImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        zIndex: 1,
+        opacity: 0.9
       }} />
 
-      {/* Main Glass Card */}
-      <motion.div 
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="glass-card" 
-        style={{ 
-          maxWidth: '900px', 
-          width: '100%',
-          padding: '80px 40px',
-          textAlign: 'center',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '40px',
-          background: 'rgba(255, 255, 255, 0.03)',
-          backdropFilter: 'blur(30px) saturate(180%)',
-          position: 'relative',
-          overflow: 'hidden'
-        }}
-      >
-        {/* Animated Brain Wave Icon */}
+      {/* Interactive Overlay Layer */}
+      <div style={{ 
+        position: 'relative', 
+        zIndex: 2, 
+        width: '100%', 
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        
+        {/* We recreate the button and invisible trigger areas over the image's design */}
         <motion.div
-           animate={{ scale: [1, 1.1, 1] }}
-           transition={{ repeat: Infinity, duration: 4 }}
-           style={{ margin: '0 auto 40px', display: 'flex', justifyContent: 'center' }}
+           initial={{ opacity: 0 }}
+           animate={{ opacity: 1 }}
+           transition={{ delay: 0.5, duration: 1 }}
+           style={{ textAlign: 'center' }}
         >
-          <div style={{ 
-            padding: '25px', 
-            borderRadius: '50%', 
-            background: 'radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%)',
-            boxShadow: '0 0 50px rgba(139, 92, 246, 0.4)'
-          }}>
-            <Brain size={80} color="#a78bfa" />
-          </div>
+          {/* Transparent trigger area over the "Start Your Journey" button in the image */}
+          <button 
+            onClick={() => navigate('/register')}
+            style={{
+              padding: '15px 40px',
+              fontSize: '1.1rem',
+              fontWeight: 600,
+              color: 'white',
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '50px',
+              cursor: 'pointer',
+              backdropFilter: 'blur(10px)',
+              transition: 'all 0.3s ease',
+              marginTop: '130px', // Adjusted to align with the image's button position
+              boxShadow: '0 0 30px rgba(139, 92, 246, 0.3)'
+            }}
+            onMouseOver={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.2)'}
+            onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.1)'}
+          >
+            Start Your Journey
+          </button>
         </motion.div>
 
-        <h1 style={{ 
-          fontSize: '3.5rem', 
-          fontWeight: 800, 
-          marginBottom: '20px', 
-          lineHeight: 1.1,
-          letterSpacing: '-1px'
-        }} className="gradient-text">
-          Meet CareFlow AI: Your Empathetic Partner in Personal Wellness
-        </h1>
-
-        <p style={{ 
-          fontSize: '1.2rem', 
-          color: 'var(--text-muted)', 
-          maxWidth: '600px', 
-          margin: '0 auto 40px',
-          lineHeight: 1.6
-        }}>
-          Advanced health insights, anytime you need them. <br />
-          Connect and thrive with personalized AI care.
-        </p>
-
-        <button 
-          onClick={() => navigate('/register')}
-          className="btn-primary" 
-          style={{ 
-            fontSize: '1.1rem', 
-            padding: '16px 40px', 
-            borderRadius: '100px',
-            boxShadow: '0 10px 40px rgba(139, 92, 246, 0.3)'
-          }}
-        >
-          Start Your Journey <ArrowRight style={{ marginLeft: '10px' }} />
-        </button>
-
-        {/* Small floating info card */}
+        {/* Floating bottom login area (approximate position from image) */}
         <div style={{
           position: 'absolute',
-          bottom: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          padding: '12px 25px',
-          borderRadius: '20px',
-          background: 'rgba(255, 255, 255, 0.05)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          width: 'max-content'
-        }}>
-           <Activity color="#ec4899" size={20} />
-           <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Mind & Heart: We understand.</span>
+          bottom: '10%',
+          right: '8%',
+          width: '280px',
+          height: '150px',
+          cursor: 'pointer'
+        }} onClick={() => navigate('/login')}>
+          {/* This acts as a hit zone for the login box in the image */}
         </div>
-      </motion.div>
 
-      {/* Decorative floating elements */}
-      <div style={{ display: 'flex', gap: '30px', marginTop: '40px' }}>
-        <div className="glass-card" style={{ padding: '20px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <Heart color="#ef4444" size={24} />
-          <span style={{ fontSize: '0.9rem' }}>Real-time Support</span>
-        </div>
-        <div className="glass-card" style={{ padding: '20px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <Activity color="#22c55e" size={24} />
-          <span style={{ fontSize: '0.9rem' }}>Deep Insights</span>
-        </div>
       </div>
-
     </div>
   );
 };
