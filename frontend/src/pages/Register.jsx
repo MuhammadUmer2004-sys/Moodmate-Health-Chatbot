@@ -19,7 +19,8 @@ const Register = ({ setUser }) => {
       setUser(data.user);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      console.error("API Error details:", err);
+      setError(err.response?.data?.message || err.message || 'Registration failed');
     }
   };
 
