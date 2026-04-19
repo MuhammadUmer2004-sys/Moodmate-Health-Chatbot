@@ -20,12 +20,8 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow any localhost origin (5173, 5174, 3000) or explicitly defined frontend URL
-      if (!origin || origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:") || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
+      // Allow all origins dynamically (Useful for Vercel auto-deployments)
+      callback(null, true);
     },
     credentials: true,
   })
