@@ -29,7 +29,8 @@ const Navbar = ({ user, setUser }) => {
               <button onClick={handleLogout} className="btn-secondary" style={{ background: 'var(--glass)', border: '1px solid var(--glass-border)', color: 'white', padding: '8px 15px', borderRadius: '10px' }}>
                 <LogOut size={18}/>
               </button>
-            </>
+            </div>
+          </>
         ) : (
           <>
             <Link to="/login" style={{ color: 'var(--text)', textDecoration: 'none', fontWeight: 600 }}>Login</Link>
