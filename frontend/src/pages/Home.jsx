@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import heroImage from '../assets/hero.png';
+import { ArrowRight, Bot } from 'lucide-react';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -11,13 +12,13 @@ const Home = () => {
       minHeight: '100vh', 
       width: '100%',
       position: 'relative',
-      overflow: 'hidden',
+      overflowX: 'hidden',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       background: '#0a0a1a'
     }}>
-      {/* Background Image Layer */}
+      {/* Background Image Layer - Covers everything */}
       <div style={{
         position: 'absolute',
         top: 0,
@@ -28,65 +29,132 @@ const Home = () => {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         zIndex: 1,
-        opacity: 0.9
+        opacity: 0.7
       }} />
 
-      {/* Interactive Overlay Layer */}
+      {/* Responsive Content Layer */}
       <div style={{ 
         position: 'relative', 
         zIndex: 2, 
         width: '100%', 
-        height: '100vh',
+        maxWidth: '1200px',
+        padding: '20px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        minHeight: '100vh',
+        textAlign: 'center'
       }}>
         
-        {/* We recreate the button and invisible trigger areas over the image's design */}
-        <motion.div
-           initial={{ opacity: 0 }}
-           animate={{ opacity: 1 }}
-           transition={{ delay: 0.5, duration: 1 }}
-           style={{ textAlign: 'center' }}
+        {/* Responsive Glass Card */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="glass-card"
+          style={{
+            padding: 'calc(20px + 4vw)',
+            borderRadius: 'clamp(20px, 5vw, 40px)',
+            background: 'rgba(255, 255, 255, 0.03)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            width: '100%',
+            maxWidth: '900px',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '20px'
+          }}
         >
-          {/* Transparent trigger area over the "Start Your Journey" button in the image */}
+          {/* Logo/Icon Area */}
+          <div style={{
+            width: 'clamp(60px, 15vw, 100px)',
+            height: 'clamp(60px, 15vw, 100px)',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, transparent 70%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '10px'
+          }}>
+            <Bot size={40} color="#a78bfa" className="pulse" />
+          </div>
+
+          <h1 style={{ 
+            fontSize: 'clamp(1.8rem, 5vw, 3.5rem)', 
+            fontWeight: 800, 
+            lineHeight: 1.1,
+            margin: 0
+          }} className="gradient-text">
+            Meet CareFlow AI: Your Empathetic Partner in Personal Wellness
+          </h1>
+
+          <p style={{ 
+            fontSize: 'clamp(1rem, 2vw, 1.25rem)', 
+            color: 'var(--text-muted)',
+            maxWidth: '650px',
+            lineHeight: 1.5,
+            margin: '10px 0'
+          }}>
+            Advanced health insights, anytime you need them. Connect and thrive with personalized AI care.
+          </p>
+
           <button 
             onClick={() => navigate('/register')}
-            style={{
-              padding: '15px 40px',
-              fontSize: '1.1rem',
-              fontWeight: 600,
-              color: 'white',
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+            className="btn-primary"
+            style={{ 
+              padding: 'clamp(12px, 3vw, 18px) clamp(30px, 6vw, 50px)',
+              fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
               borderRadius: '50px',
-              cursor: 'pointer',
-              backdropFilter: 'blur(10px)',
-              transition: 'all 0.3s ease',
-              marginTop: '130px', // Adjusted to align with the image's button position
-              boxShadow: '0 0 30px rgba(139, 92, 246, 0.3)'
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              marginTop: '10px'
             }}
-            onMouseOver={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.2)'}
-            onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.1)'}
           >
-            Start Your Journey
+            Start Your Journey <ArrowRight size={20} />
           </button>
+
+          {/* Floating badge for mobile (stacked) */}
+          <div style={{
+            marginTop: '20px',
+            padding: '10px 20px',
+            borderRadius: '100px',
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            fontSize: '0.85rem'
+          }}>
+            Mind & Heart: We understand.
+          </div>
         </motion.div>
 
-        {/* Floating bottom login area (approximate position from image) */}
-        <div style={{
-          position: 'absolute',
-          bottom: '10%',
-          right: '8%',
-          width: '280px',
-          height: '150px',
-          cursor: 'pointer'
-        }} onClick={() => navigate('/login')}>
-          {/* This acts as a hit zone for the login box in the image */}
+        {/* Login Hint for mobile */}
+        <div 
+          onClick={() => navigate('/login')}
+          style={{ 
+            marginTop: '30px', 
+            color: 'var(--text-muted)', 
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            textDecoration: 'underline'
+          }}
+        >
+          Already have an account? Sign In
         </div>
 
       </div>
+
+      <style>{`
+        .pulse {
+          animation: pulse-animation 3s infinite ease-in-out;
+        }
+        @keyframes pulse-animation {
+          0% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5)); }
+          50% { transform: scale(1.1); filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.8)); }
+          100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5)); }
+        }
+      `}</style>
     </div>
   );
 };
