@@ -11,14 +11,16 @@ import {
   Tooltip, 
   Legend 
 } from 'chart.js';
-import { Smile, Frown, Meh, AlertCircle, Send, Trash2 } from 'lucide-react';
+import { Smile, Frown, Meh, AlertCircle, Send, Sparkles, History } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ChartTitle, Tooltip, Legend);
 
 const Dashboard = () => {
   const [moods, setMoods] = useState([]);
   const [note, setNote] = useState('');
-  const [selectedMood, setSelectedMood] = useState('happy');
+  const [analyzing, setAnalyzing] = useState(false);
+  const [error, setError] = useState('');
 
   const fetchMoods = async () => {
     try {
@@ -33,117 +35,220 @@ const Dashboard = () => {
 
   const handleAddMood = async (e) => {
     e.preventDefault();
+    if (!note.trim()) return;
+    
+    setAnalyzing(true);
+    setError('');
+    
     try {
-      await api.post('/moods', { moodType: selectedMood, note });
+      await api.post('/moods', { note });
       setNote('');
       fetchMoods();
     } catch (err) {
-      console.error(err);
+      setError('Failed to analyze mood. Please try again.');
+    } finally {
+      setAnalyzing(false);
     }
   };
 
   const chartData = {
-    labels: moods.slice(0, 7).reverse().map(m => new Date(m.timestamp).toLocaleDateString()),
+    labels: moods.slice(0, 10).reverse().map(m => new Date(m.timestamp).toLocaleDateString()),
     datasets: [{
-      label: 'Mood Sentiment Score',
-      data: moods.slice(0, 7).reverse().map(m => m.sentimentScore || 0),
+      label: 'AI Sentiment Flow',
+      data: moods.slice(0, 10).reverse().map(m => m.sentimentScore || 0),
       borderColor: '#8b5cf6',
       backgroundColor: 'rgba(139, 92, 246, 0.2)',
       tension: 0.4,
       fill: true,
+      pointBackgroundColor: '#a78bfa'
     }]
   };
 
   return (
-    <div className="dashboard-container" style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '30px' }}>
+    <div className="dashboard-container" style={{ padding: '40px 20px', maxWidth: '1200px', margin: '0 auto', minHeight: '100vh' }}>
+      
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', marginBottom: '40px' }} className="responsive-grid">
         
-        {/* Mood Form */}
-        <div className="glass-card" style={{ padding: '30px', alignSelf: 'start' }}>
-          <h3 style={{ marginBottom: '25px' }}>How are you feeling?</h3>
-          <form onSubmit={handleAddMood} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <MoodIcon type="happy" active={selectedMood === 'happy'} onClick={() => setSelectedMood('happy')} />
-              <MoodIcon type="neutral" active={selectedMood === 'neutral'} onClick={() => setSelectedMood('neutral')} />
-              <MoodIcon type="sad" active={selectedMood === 'sad'} onClick={() => setSelectedMood('sad')} />
-              <MoodIcon type="anxious" active={selectedMood === 'anxious'} onClick={() => setSelectedMood('anxious')} />
+        {/* AI Analysis Form */}
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="glass-card" 
+          style={{ padding: '35px', alignSelf: 'start' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+            <div style={{ padding: '10px', background: 'var(--primary)', borderRadius: '12px' }}>
+               <Sparkles size={24} color="white" />
             </div>
+            <h3 style={{ margin: 0 }}>Daily Reflection</h3>
+          </div>
+          
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px' }}>
+            Tell CareFlow AI how you're feeling. Our AI will automatically detect your mood and provide insights.
+          </p>
+
+          <form onSubmit={handleAddMood} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <textarea 
-              placeholder="What's causing this mood?" 
+              placeholder="Ex: I feel a bit overwhelmed today, but the morning walk helped..." 
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              style={{ padding: '15px', borderRadius: '12px', background: 'var(--surface)', border: '1px solid var(--glass-border)', color: 'white', minHeight: '100px' }}
+              style={{ 
+                padding: '20px', 
+                borderRadius: '15px', 
+                background: 'rgba(255,255,255,0.03)', 
+                border: '1px solid var(--glass-border)', 
+                color: 'white', 
+                minHeight: '150px',
+                fontSize: '1rem',
+                outline: 'none',
+                transition: 'border 0.3s'
+              }}
+              onFocus={(e) => e.target.style.border = '1px solid var(--primary)'}
+              onBlur={(e) => e.target.style.border = '1px solid var(--glass-border)'}
             />
-            <button type="submit" className="btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-              <Send size={18} /> Log Mood
+            {error && <div style={{ color: 'var(--error)', fontSize: '0.85rem' }}>{error}</div>}
+            
+            <button 
+              type="submit" 
+              disabled={analyzing || !note.trim()}
+              className="btn-primary" 
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                gap: '12px',
+                padding: '16px',
+                opacity: (analyzing || !note.trim()) ? 0.7 : 1
+              }}
+            >
+              {analyzing ? 'Analyzing Vibe...' : <><Send size={18} /> Analyze & Log</>}
             </button>
           </form>
-        </div>
+        </motion.div>
 
-        {/* Analytics */}
-        <div className="glass-card" style={{ padding: '30px' }}>
-          <h3 style={{ marginBottom: '25px' }}>Mood Analytics (Last 7 Days)</h3>
-          <div style={{ height: '300px' }}>
-            <Line data={chartData} options={{ maintainAspectRatio: false, scales: { y: { beginAtZero: false, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } } }} />
+        {/* Analytics Visualization */}
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="glass-card" 
+          style={{ padding: '35px' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
+            <div style={{ padding: '10px', background: 'rgba(139, 92, 246, 0.2)', borderRadius: '12px' }}>
+               <Smile size={24} color="#a78bfa" />
+            </div>
+            <h3 style={{ margin: 0 }}>Mood Trends</h3>
           </div>
-        </div>
+          <div style={{ height: '350px' }}>
+            <Line 
+              data={chartData} 
+              options={{ 
+                maintainAspectRatio: false, 
+                plugins: { legend: { display: false } },
+                scales: { 
+                  y: { 
+                    beginAtZero: false, 
+                    grid: { color: 'rgba(255,255,255,0.05)' } 
+                  }, 
+                  x: { grid: { display: false } } 
+                } 
+              }} 
+            />
+          </div>
+        </motion.div>
 
       </div>
 
-      {/* History */}
-      <div className="glass-card" style={{ marginTop: '30px', padding: '30px' }}>
-        <h3 style={{ marginBottom: '20px' }}>Recent Logs</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
-          {moods.map(mood => (
-            <div key={mood._id} style={{ display: 'flex', alignItems: 'start', gap: '15px', padding: '15px', background: 'var(--surface)', borderRadius: '15px', border: '1px solid var(--glass-border)' }}>
-              <MoodBadge type={mood.moodType} />
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                  <strong>{mood.moodType.toUpperCase()}</strong>
-                  <small style={{ color: 'var(--text-muted)' }}>{new Date(mood.timestamp).toLocaleDateString()}</small>
+      {/* History Timeline */}
+      <div className="glass-card" style={{ padding: '35px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
+           <History size={24} color="var(--text-muted)" />
+           <h3 style={{ margin: 0 }}>Emotional History</h3>
+        </div>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '20px' }}>
+          <AnimatePresence>
+            {moods.map((mood, index) => (
+              <motion.div 
+                key={mood._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: '12px', 
+                  padding: '25px', 
+                  background: 'rgba(255,255,255,0.02)', 
+                  borderRadius: '20px', 
+                  border: '1px solid var(--glass-border)',
+                  position: 'relative'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <MoodBadge type={mood.moodType} />
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    {new Date(mood.timestamp).toLocaleDateString()}
+                  </span>
                 </div>
-                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{mood.note}</p>
+                
+                <p style={{ fontSize: '0.95rem', color: 'white', lineHeight: 1.5, margin: 0 }}>
+                  "{mood.note}"
+                </p>
+
                 {mood.isUrgent && (
-                  <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--error)', fontSize: '0.8rem', fontWeight: 600 }}>
-                    <AlertCircle size={14} /> Urgent: Support recommended
+                  <div style={{ 
+                    marginTop: '10px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px', 
+                    color: '#f87171', 
+                    fontSize: '0.8rem', 
+                    fontWeight: 600,
+                    padding: '8px 12px',
+                    background: 'rgba(248, 113, 113, 0.1)',
+                    borderRadius: '10px'
+                  }}>
+                    <AlertCircle size={14} /> Urgent Flag: Please check in with yourself.
                   </div>
                 )}
-              </div>
-            </div>
-          ))}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </div>
-    </div>
-  );
-};
-
-const MoodIcon = ({ type, active, onClick }) => {
-  const icons = {
-    happy: <Smile size={24} />,
-    neutral: <Meh size={24} />,
-    sad: <Frown size={24} />,
-    anxious: <AlertCircle size={24} />,
-  };
-  return (
-    <div 
-      onClick={onClick}
-      style={{ 
-        cursor: 'pointer', 
-        padding: '12px', 
-        borderRadius: '12px', 
-        background: active ? 'var(--primary)' : 'var(--surface)', 
-        color: active ? 'white' : 'var(--text-muted)',
-        transition: 'all 0.2s'
-      }}
-    >
-      {icons[type]}
     </div>
   );
 };
 
 const MoodBadge = ({ type }) => {
-  const colors = { happy: '#22c55e', neutral: '#94a3b8', sad: '#f59e0b', anxious: '#ef4444' };
-  return <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: colors[type] || 'var(--primary)', marginTop: '5px' }} />;
+  const configs = {
+    happy: { color: '#22c55e', text: 'Joyful' },
+    neutral: { color: '#94a3b8', text: 'Neutral' },
+    sad: { color: '#3b82f6', text: 'Low' },
+    anxious: { color: '#f59e0b', text: 'Anxious' },
+    urgent: { color: '#ef4444', text: 'Critical' }
+  };
+  const config = configs[type.toLowerCase()] || configs.neutral;
+  
+  return (
+    <div style={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      gap: '8px', 
+      padding: '5px 12px', 
+      borderRadius: '100px', 
+      background: `${config.color}20`,
+      border: `1px solid ${config.color}40`,
+      color: config.color,
+      fontSize: '0.75rem',
+      fontWeight: 700,
+      textTransform: 'uppercase'
+    }}>
+      <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: config.color }} />
+      {config.text}
+    </div>
+  );
 }
 
 export default Dashboard;

@@ -14,22 +14,20 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-// Add a mood entry
+// Add a mood entry (with AI Autodetection)
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const { moodType, note } = req.body;
-    const sentiment = getSentiment(note || "");
+    const { note } = req.body;
     
-    // Flag urgent if sentiment is negative and certain keywords are present
-    const urgentKeywords = ["help", "kill", "die", "suicide", "end", "desperate", "hospital", "hurt"];
-    const isUrgent = sentiment === "negative" && urgentKeywords.some(kw => note.toLowerCase().includes(kw));
+    // AI Detects everything from the note!
+    const { score, category, isUrgent } = getSentiment(note || "");
 
     const mood = new Mood({
       userId: req.user.userId,
-      moodType,
+      moodType: category, // Auto-detected category
       note,
       isUrgent,
-      sentimentScore: sentiment === "positive" ? 1 : sentiment === "negative" ? -1 : 0
+      sentimentScore: score
     });
 
     await mood.save();
