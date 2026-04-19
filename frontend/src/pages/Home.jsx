@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import heroImage from '../assets/hero.png';
-import { ArrowRight, Bot, Shield, Zap } from 'lucide-react';
+import heroImage from '../assets/hero_clean.png';
+import { ArrowRight, Bot, Shield, Activity } from 'lucide-react';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -13,11 +13,11 @@ const Home = () => {
       width: '100%',
       position: 'relative',
       overflow: 'hidden',
-      background: '#0a0a1a',
+      background: '#04040c',
       display: 'flex',
       alignItems: 'center'
     }}>
-      {/* Immersive Background */}
+      {/* Immersive CLEAN Background (No more overlapping text!) */}
       <div style={{
         position: 'absolute',
         top: 0,
@@ -28,88 +28,111 @@ const Home = () => {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         zIndex: 1,
-        opacity: 0.6
+        opacity: 0.8
       }} />
 
-      {/* Hero Content Section (Shifted to Side) */}
+      {/* Professional Content Layer */}
       <div style={{ 
         position: 'relative', 
         zIndex: 2, 
         width: '100%', 
         maxWidth: '1400px',
         margin: '0 auto',
-        padding: '0 5%',
+        padding: '0 8%',
         display: 'flex',
-        flexWrap: 'wrap',
         alignItems: 'center',
-        justifyContent: 'flex-start' // Align to left
+        justifyContent: 'flex-start'
       }}>
         
         <motion.div 
-          initial={{ opacity: 0, x: -50 }}
+          initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-          className="glass-card"
+          transition={{ duration: 1 }}
           style={{
-            padding: '60px 50px',
-            borderRadius: '40px',
-            background: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(30px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            padding: '70px 60px',
+            borderRadius: '50px',
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%)',
+            backdropFilter: 'blur(40px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
             width: '100%',
-            maxWidth: '600px', // Smaller width to stay on the side
+            maxWidth: '650px',
             textAlign: 'left',
-            boxShadow: '0 40px 100px rgba(0,0,0,0.5)'
+            boxShadow: '0 50px 100px rgba(0,0,0,0.6)'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
-             <div style={{ padding: '12px', background: 'var(--primary)', borderRadius: '15px' }}>
-                <Bot size={28} color="white" />
+          {/* Branding */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '40px' }}>
+             <div style={{ padding: '15px', background: 'var(--primary)', borderRadius: '20px', boxShadow: '0 0 20px rgba(139, 92, 246, 0.4)' }}>
+                <Bot size={30} color="white" />
              </div>
-             <span style={{ fontSize: '1.2rem', fontWeight: 700, letterSpacing: '2px' }}>CAREFLOW AI</span>
+             <span style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '4px', color: 'rgba(255,255,255,0.9)' }}>CAREFLOW AI</span>
           </div>
 
           <h1 style={{ 
-            fontSize: 'clamp(2.5rem, 4vw, 3.8rem)', 
-            fontWeight: 800, 
+            fontSize: 'clamp(2.8rem, 5vw, 4.5rem)', 
+            fontWeight: 900, 
             lineHeight: 1,
-            marginBottom: '25px'
+            marginBottom: '30px',
+            letterSpacing: '-2px'
           }} className="gradient-text">
-            Meet CareFlow AI: Your Empathetic Partner
+            Meet CareFlow AI:<br />Your Partner
           </h1>
 
           <p style={{ 
-            fontSize: '1.15rem', 
+            fontSize: '1.2rem', 
             color: 'var(--text-muted)',
-            lineHeight: 1.6,
-            marginBottom: '40px'
+            lineHeight: 1.7,
+            marginBottom: '45px',
+            maxWidth: '500px'
           }}>
-            Advanced health insights, anytime you need them. Connect and thrive with personalized AI care focused on your mind & heart.
+            Experience advanced salud insights and personalized AI support designed to prioritize your emotional and physical wellness.
           </p>
 
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
             <button 
               onClick={() => navigate('/register')}
               className="btn-primary"
-              style={{ padding: '18px 45px', borderRadius: '100px', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' }}
+              style={{ 
+                padding: '20px 50px', 
+                borderRadius: '100px', 
+                fontSize: '1.15rem', 
+                fontWeight: 700,
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '12px' 
+              }}
             >
-              Start Your Journey <ArrowRight size={20} />
+              Start Journey <ArrowRight size={22} />
             </button>
             <button 
               onClick={() => navigate('/login')}
-              className="btn-secondary"
-              style={{ background: 'transparent', border: '1px solid var(--glass-border)', padding: '18px 45px', borderRadius: '100px', color: 'white' }}
+              style={{ 
+                background: 'rgba(255,255,255,0.05)', 
+                border: '1px solid rgba(255,255,255,0.1)', 
+                padding: '20px 50px', 
+                borderRadius: '100px', 
+                color: 'white',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
             >
               Sign In
             </button>
           </div>
 
-          <div style={{ marginTop: '50px', display: 'flex', gap: '30px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '30px' }}>
-             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                <Shield size={18} color="#22c55e" /> Secure Encrypted
+          {/* Footer stats / trust indicators */}
+          <div style={{ 
+            marginTop: '60px', 
+            display: 'flex', 
+            gap: '40px', 
+            borderTop: '1px solid rgba(255,255,255,0.05)', 
+            paddingTop: '35px' 
+          }}>
+             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
+                <Shield size={18} color="#22c55e" /> HIPAA Compliant
              </div>
-             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                <Zap size={18} color="#eab308" /> Real-time Analysis
+             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
+                <Activity size={18} color="#ec4899" /> 24/7 AI Support
              </div>
           </div>
         </motion.div>
