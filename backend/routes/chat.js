@@ -10,9 +10,9 @@ router.post("/", verifyToken, async (req, res) => {
   const { text } = req.body;
   const userId = req.user.userId;
 
-  const sentiment = getSentiment(text);
+  const { score, category, isUrgent } = getSentiment(text);
   
-  let responseText = `Hello! I see you're feeling ${sentiment}. How can I support you today?`;
+  let responseText = `Hello! I see you're feeling ${category}. How can I support you today?`;
   
   // Try OpenAI if API key exists
   if (process.env.OPENAI_API_KEY) {
@@ -41,7 +41,7 @@ router.post("/", verifyToken, async (req, res) => {
       userId,
       text,
       response: responseText,
-      sentiment,
+      sentiment: category,
     });
 
     await message.save();
